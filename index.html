@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestione Spese Food per Fornitore</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #111827;
+      background: #f3f4f6;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      max-width: 1100px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 1rem;
+      padding: 1.8rem;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 1.4rem;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: flex-end;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 180px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: #374151;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 0.55rem 0.7rem;
+      border-radius: 0.6rem;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #f9fafb;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+      background: #ffffff;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-card {
+      background: #f9fafb;
+      border-radius: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid #e5e7eb;
+    }
+
+    .summary-label {
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+    }
+
+    .summary-value {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .summary-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      margin-top: 0.2rem;
+    }
+
+    .badge-ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-warn {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-gold {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #facc15;
+    }
+
+    .badge-silver {
+      background: #e5e7eb;
+      color: #374151;
+      border: 1px solid #9ca3af;
+    }
+
+    .badge-lose {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+
+    thead {
+      background: #f3f4f6;
+    }
+
+    th, td {
+      padding: 0.55rem 0.6rem;
+      font-size: 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      font-weight: 600;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .number-cell {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #6b7280;
+    }
+
+    .btn-ghost:hover {
+      background: #f3f4f6;
+    }
+
+    .btn-danger {
+      color: #b91c1c;
+    }
+
+    .row-over td {
+      background: #fee2e2 !important;
+      color: #b91c1c;
+    }
+
+    .category-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .category-icon {
+      font-size: 1.2rem;
+    }
+
+    .category-select {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.3rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
+      }
+      .app {
+        padding: 1.2rem;
+      }
+      th, td {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Gestione Spese Food per Fornitore</h1>
+    <div class="subtitle">
+      Inserisci il fatturato del periodo e la percentuale allocata a ciascun fornitore.
+      Il sistema calcola automaticamente budget, residuo e ti dà un feedback gamificato.
+    </div>
+
+    <div class="top-bar">
+      <div class="field-group">
+        <label for="periodo">Periodo (es. Marzo 2026)</label>
+        <input id="periodo" type="text" placeholder="Es. Marzo 2026" />
+      </div>
+      <div class="field-group">
+        <label for="fatturato">Fatturato periodo (€)</label>
+        <input id="fatturato" type="number" min="0" step="0.01" />
+      </div>
+      <div class="field-group">
+        <button id="addSupplierBtn" class="btn btn-primary">
+          + Aggiungi fornitore
+        </button>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-card">
+        <div class="summary-label">Fatturato</div>
+        <div class="summary-value" id="sumFatturato">€ 0,00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Budget totale allocato</div>
+        <div class="summary-value" id="sumBudget">€ 0,00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Spese totali</div>
+        <div class="summary-value" id="sumSpese">€ 0,00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Residuo complessivo</div>
+        <div class="summary-value" id="sumResiduo">€ 0,00</div>
+        <div id="percentInfo"></div>
+        <div id="gamificationTag"></div>
+      </div>
+    </div>
+
+    <h2>Fornitori</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Categoria</th>
+          <th>Fornitore</th>
+          <th>% su fatturato</th>
+          <th>Budget (€)</th>
+          <th>Speso (€)</th>
+          <th>Residuo (€)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="suppliersBody">
+        <!-- Righe generate via JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const fatturatoInput = document.getElementById("fatturato");
+    const periodoInput = document.getElementById("periodo");
+    const suppliersBody = document.getElementById("suppliersBody");
+    const addSupplierBtn = document.getElementById("addSupplierBtn");
+
+    const sumFatturatoEl = document.getElementById("sumFatturato");
+    const sumBudgetEl = document.getElementById("sumBudget");
+    const sumSpeseEl = document.getElementById("sumSpese");
+    const sumResiduoEl = document.getElementById("sumResiduo");
+    const percentInfoEl = document.getElementById("percentInfo");
+    const gamificationTagEl = document.getElementById("gamificationTag");
+
+    const STORAGE_KEY = "foodBudgetAppData_v2";
+
+    let state = {
+      periodo: "",
+      fatturato: 0,
+      suppliers: []
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          state = Object.assign(state, parsed);
+        }
+      } catch (e) {
+        console.error("Errore caricamento dati", e);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function formatCurrency(value) {
+      const v = isNaN(value) ? 0 : value;
+      return v.toLocaleString("it-IT", {
+        style: "currency",
+        currency: "EUR",
+        minimumFractionDigits: 2
+      });
+    }
+
+    function getCategoryIcon(cat) {
+      switch (cat) {
+        case "Verdura": return "🥦";
+        case "Carne": return "🥩";
+        case "Congelato": return "🧊";
+        case "Scatolame": return "🥫";
+        case "Latte": return "🥛";
+        case "Detersivi": return "🧼";
+        case "Drink": return "🍹";
+        default: return "❓";
+      }
+    }
+
+    function render() {
+      periodoInput.value = state.periodo || "";
+      fatturatoInput.value = state.fatturato || "";
+
+      const fatturato = Number(state.fatturato) || 0;
+      let totalBudget = 0;
+      let totalSpese = 0;
+      let totalPercent = 0;
+
+      suppliersBody.innerHTML = "";
+
+      state.suppliers.forEach((sup, index) => {
+        const percent = Number(sup.percent) || 0;
+        const speso = Number(sup.speso) || 0;
+
+        const budget = fatturato * (percent / 100);
+        const residuo = budget - speso;
+
+        totalBudget += budget;
+        totalSpese += speso;
+        totalPercent += percent;
+
+        const tr = document.createElement("tr");
+
+        if (speso > budget + 0.0001) {
+          tr.classList.add("row-over");
+        }
+
+        // Categoria
+        const tdCat = document.createElement("td");
+        tdCat.className = "category-cell";
+
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "category-icon";
+        iconSpan.textContent = sup.categoria ? getCategoryIcon(sup.categoria) : "❓";
+
+        const select = document.createElement("select");
+        select.className = "category-select";
+        const categories = ["", "Verdura", "Carne", "Congelato", "Scatolame", "Latte", "Detersivi", "Drink"];
+
+        categories.forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat;
+          opt.textContent = cat === "" ? "Categoria" : cat;
+          if (cat === (sup.categoria || "")) opt.selected = true;
+          select.appendChild(opt);
+        });
+
+        select.addEventListener("change", (e) => {
+          state.suppliers[index].categoria = e.target.value;
+          iconSpan.textContent = e.target.value ? getCategoryIcon(e.target.value) : "❓";
+          saveState();
+        });
+
+        tdCat.appendChild(iconSpan);
+        tdCat.appendChild(select);
+        tr.appendChild(tdCat);
+
+        // Nome
+        const tdNome = document.createElement("td");
+        const nomeInput = document.createElement("input");
+        nomeInput.type = "text";
+        nomeInput.value = sup.nome || "";
+        nomeInput.placeholder = "Nome fornitore";
+        nomeInput.addEventListener("input", (e) => {
+          state.suppliers[index].nome = e.target.value;
+          saveState();
+        });
+        tdNome.appendChild(nomeInput);
+        tr.appendChild(tdNome);
+
+        // Percentuale
+        const tdPercent = document.createElement("td");
+        tdPercent.className = "number-cell";
+        const percentInput = document.createElement("input");
+        percentInput.type = "number";
+        percentInput.min = "0";
+        percentInput.max = "100";
+        percentInput.step = "0.01";
+        percentInput.value = sup.percent || "";
+        percentInput.style.width = "80px";
+        percentInput.addEventListener("input", (e) => {
+          state.suppliers[index].percent = e.target.value;
+          saveState();
+        });
+        percentInput.addEventListener("blur", () => {
+          render();
+        });
+        tdPercent.appendChild(percentInput);
+        tr.appendChild(tdPercent);
+
+        // Budget
+        const tdBudget = document.createElement("td");
+        tdBudget.className = "number-cell";
+        tdBudget.textContent = formatCurrency(budget);
+        tr.appendChild(tdBudget);
+
+        // Speso
+        const tdSpeso = document.createElement("td");
+        tdSpeso.className = "number-cell";
+        const spesoInput = document.createElement("input");
+        spesoInput.type = "number";
+        spesoInput.min = "0";
+        spesoInput.step = "0.01";
+        spesoInput.value = sup.speso || "";
+        spesoInput.style.width = "100px";
+        spesoInput.addEventListener("input", (e) => {
+          state.suppliers[index].speso = e.target.value;
+          saveState();
+        });
+        spesoInput.addEventListener("blur", () => {
+          render();
+        });
+        tdSpeso.appendChild(spesoInput);
+        tr.appendChild(tdSpeso);
+
+        // Residuo
+        const tdResiduo = document.createElement("td");
+        tdResiduo.className = "number-cell";
+        tdResiduo.textContent = formatCurrency(residuo);
+        tr.appendChild(tdResiduo);
+
+        // Azioni
+        const tdActions = document.createElement("td");
+        tdActions.className = "number-cell";
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn btn-ghost btn-danger";
+        delBtn.textContent = "✕";
+        delBtn.title = "Rimuovi fornitore";
+        delBtn.addEventListener("click", () => {
+          state.suppliers.splice(index, 1);
+          saveState();
+          render();
+        });
+        tdActions.appendChild(delBtn);
+        tr.appendChild(tdActions);
+
+        suppliersBody.appendChild(tr);
+      });
+
+      const residuoTotale = totalBudget - totalSpese;
+
+      sumFatturatoEl.textContent = formatCurrency(fatturato);
+      sumBudgetEl.textContent = formatCurrency(totalBudget);
+      sumSpeseEl.textContent = formatCurrency(totalSpese);
+      sumResiduoEl.textContent = formatCurrency(residuoTotale);
+
+      // Badge percentuali budget (somma %)
+      percentInfoEl.innerHTML = "";
+      const badge = document.createElement("div");
+      const text = `Somma percentuali: ${totalPercent.toFixed(2)} %`;
+      if (totalPercent > 100.01) {
+        badge.className = "summary-badge badge-warn";
+        badge.textContent = text + " (oltre 100%!)";
+      } else if (totalPercent >= 99.5 && totalPercent <= 100.5) {
+        badge.className = "summary-badge badge-ok";
+        badge.textContent = text + " (ok, circa 100%)";
+      } else {
+        badge.className = "summary-badge";
+        badge.style.background = "#e5e7eb";
+        badge.style.color = "#374151";
+        badge.textContent = text;
+      }
+      percentInfoEl.appendChild(badge);
+
+      // GAMIFICATION: max spesa 50% fatturato
+      gamificationTagEl.innerHTML = "";
+      if (fatturato > 0) {
+        const percSpesa = (totalSpese / fatturato) * 100;
+        const label = `Spesa totale: ${percSpesa.toFixed(1)}% del fatturato (limite 50%)`;
+        const tag = document.createElement("div");
+
+        if (percSpesa <= 30) {
+          tag.className = "summary-badge badge-gold";
+          tag.textContent = "🏆 " + label;
+        } else if (percSpesa <= 50) {
+          tag.className = "summary-badge badge-silver";
+          tag.textContent = "⚪ " + label;
+        } else {
+          tag.className = "summary-badge badge-lose";
+          tag.textContent = "❌ " + label;
+        }
+        gamificationTagEl.appendChild(tag);
+      }
+    }
+
+    // Eventi globali
+    fatturatoInput.addEventListener("input", (e) => {
+      state.fatturato = Number(e.target.value) || 0;
+      saveState();
+      render();
+    });
+
+    periodoInput.addEventListener("input", (e) => {
+      state.periodo = e.target.value;
+      saveState();
+    });
+
+    addSupplierBtn.addEventListener("click", () => {
+      state.suppliers.push({
+        nome: "",
+        categoria: "",
+        percent: "",
+        speso: ""
+      });
+      saveState();
+      render();
+    });
+
+    // Init
+    loadState();
+    if (!state.suppliers.length) {
+      state.suppliers = [
+        { nome: "Fornitore 1", categoria: "Verdura", percent: "10", speso: "" },
+        { nome: "Fornitore 2", categoria: "Carne", percent: "5", speso: "" }
+      ];
+    }
+    render();
+  </script>
+</body>
+</html>
